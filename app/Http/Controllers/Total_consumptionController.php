@@ -15,12 +15,16 @@ class Total_consumptionController extends Controller
       q2.HOST,
       q2.device_id,
       q2.wh_R - q1.wh_R AS value,
-      q2.wh_D - q1.wh_D AS value1,
-      q2.wh_1 - q1.wh_1 AS value2,
-      q2.wh_2 - q1.wh_2 AS value3,
-      q2.wh_3 - q1.wh_3 AS value4
+      q2.wh_D - q1.wh_D  AS value1,
+      q2.wh_1 - q1.wh_1  AS value2,
+      q2.wh_2 - q1.wh_2  AS value3,
+      q2.wh_3 - q1.wh_3  AS value4
   FROM
-      (SELECT dt_time, HOUR, HOST, device_id, wh_R, wh_D, wh_1, wh_2, wh_3
+      (SELECT dt_time, HOUR, HOST, device_id, FLOOR(wh_R/1000 ) AS wh_R,  
+                FLOOR(wh_D / 1000) AS wh_D, 
+               FLOOR(wh_1 / 1000) AS wh_1,
+                FLOOR(wh_2 / 1000) AS wh_2,
+             FLOOR(wh_3 / 1000) AS wh_3
        FROM jnmc_all_kwh
        WHERE DATE(dt_time) = ?
          AND HOUR = 23
@@ -29,7 +33,11 @@ class Total_consumptionController extends Controller
   
   LEFT JOIN
   
-      (SELECT dt_time, HOUR, HOST, device_id, wh_R, wh_D, wh_1, wh_2, wh_3
+      (SELECT dt_time, HOUR, HOST, device_id, FLOOR(wh_R/1000 ) AS wh_R,  
+                FLOOR(wh_D / 1000) AS wh_D, 
+               FLOOR(wh_1 / 1000) AS wh_1,
+                FLOOR(wh_2 / 1000) AS wh_2,
+             FLOOR(wh_3 / 1000) AS wh_3
        FROM jnmc_all_kwh
        WHERE DATE(dt_time) = DATE( ? + INTERVAL 1 day)
          AND HOUR = 0
@@ -55,7 +63,11 @@ class Total_consumptionController extends Controller
            @prev_wh_2 := wh_2 AS dummy4, 
            @prev_wh_3 := wh_3 AS dummy5
     FROM (
-      SELECT dt_time, HOUR, HOST, device_id, wh_R, wh_D, wh_1, wh_2, wh_3 
+      SELECT dt_time, HOUR, HOST, device_id, FLOOR(wh_R/1000 ) AS wh_R,  
+                FLOOR(wh_D / 1000) AS wh_D, 
+               FLOOR(wh_1 / 1000) AS wh_1,
+                FLOOR(wh_2 / 1000) AS wh_2,
+             FLOOR(wh_3 / 1000) AS wh_3
       FROM jnmc_all_kwh 
       WHERE DATE(dt_time) = ? AND HOST = ? AND device_id =? 
       ORDER BY dt_time DESC
